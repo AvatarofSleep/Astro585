@@ -10,8 +10,9 @@ end
 function leapfrog_update_pos(state::Array,dt)
   Rx = state[1] + .5*dt*state[3]
   Ry = state[2] + .5*dt*state[4]
-newstate = [Rx,Ry,state[3],state[4]]
-  return newstate
+  state[1] =Rx
+  state[2] =Ry
+  return state
 end
 
 function leapfrog_update_both(state::Array,ds,dt)
@@ -21,10 +22,14 @@ function leapfrog_update_both(state::Array,ds,dt)
 end
 
 
-function integrate_leapfrog_student(state::Array,dt,duration,GM=1)
-  r_x,r_y,v_x,v_y = [],[],[],[]
+function integrate_leapfrog_student_new(state::Array,dt,duration,GM=1)
   N = iceil(duration/dt)
   t = 0.
+  outs = Array(Float64,4,N+1)
+  outs[1,1] = state[1]
+  outs[2,1] = state[2]
+  outs[3,1] = state [3]
+  outs[4,1] = state[4]
   for i in 0:N
     dt_tmp = (t+dt<=duration) ? dt : duration-t;
 
@@ -33,12 +38,12 @@ function integrate_leapfrog_student(state::Array,dt,duration,GM=1)
     state = leapfrog_update_both(state,ds,dt_tmp)
     t += dt_tmp
 
-    r_x = vcat(r_x,[state[1]])
-    r_y = vcat(r_y,[state[2]])
-    v_x = vcat(v_x,[state[3]])
-    v_y = vcat(v_y,[state[4]])
+    outs[1,(i+1)] = state[1]
+    outs[2,(i+1)] = state[2]
+    outs[3,(i+1)] = state[3]
+    outs[4,(i+1)] = state[4]
   end
-  return (r_x,r_y,v_x,v_y)
+  return outs
 end
 
 
